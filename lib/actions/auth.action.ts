@@ -1,14 +1,17 @@
 'use server';
 
 import {db, auth} from "@/firebase/admin";
-import {cookies} from "next/headers";
+import { cookies } from "next/headers";
 
 const ONE_WEEK = 60 * 60 *24 * 7;
+
+// ✅ Check if user is authenticated
 export async function isAuthenticated() {
     const cookieStore = await cookies();
     const session = cookieStore.get("session")?.value;
 
     if (!session) return null;
+
     try {
         // Verify session cookie with Firebase Admin
         const decodedClaims = await auth.verifySessionCookie(session, true);
@@ -98,6 +101,38 @@ export async  function setSessionCookie(idToken: string) {
     })
 }
 
+/*export async function getCurrentUser(): Promise<User | null> {
+    const cookieStore =  cookies();
 
+    const sessionCookie = cookieStore.get("session")?.value;
+
+    if(!sessionCookie) return null;
+
+    try {
+        const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
+
+        const userRecord = await db
+            .collection("users")
+            .doc(decodedClaims.uid)
+            .get();
+
+        if(!userRecord.exists) return null;
+
+        return {
+            ...userRecord.data(),
+        } as User;
+    } catch (error) {
+        console.error("Error in getCurrentUser:", error);
+
+        return null;
+    }
+}
+
+export async function isAuthenticated() {
+    const user = await getCurrentUser();
+
+    return !!user;
+}
+*/
 
 
